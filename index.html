@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Case #786-A | Patient Saim</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Orbitron:wght@400;700&family=Poppins:wght@300;600&display=swap');
+        :root { --red: #ff0055; --blue: #00d4ff; --neon: #39ff14; --gold: #ffb703; --dark: #050505; }
+        
+        body, html { margin:0; padding:0; overflow:hidden; font-family:'Poppins', sans-serif; background: var(--dark); color: #fff; cursor: crosshair; }
+        .stage { display:none; width:100vw; height:100vh; justify-content:center; align-items:center; flex-direction:column; text-align:center; position:absolute; padding: 20px; box-sizing: border-box; background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%); }
+        .active { display:flex; animation: fadeIn 0.8s forwards; }
+
+        /* Slide 1: 3D Door */
+        .door-scene { perspective: 1200px; width: 180px; height: 280px; cursor: pointer; }
+        .door { width: 100%; height: 100%; background: #2c3e50; border: 4px solid #fff; border-radius: 5px; transform-origin: left; transition: 1.5s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
+        .door.open { transform: rotateY(-110deg); }
+        .door-sign { position: absolute; top: 25%; left: 10%; width: 80%; background: var(--red); color: white; padding: 8px 0; font-family: 'Orbitron'; font-size: 0.6rem; }
+
+        /* Scanning UI */
+        .scan-line { width: 250px; height: 2px; background: var(--neon); box-shadow: 0 0 15px var(--neon); position: relative; animation: scanAnim 2s infinite; }
+        @keyframes scanAnim { 0%, 100% { top: -40px; } 50% { top: 40px; } }
+
+        /* Prescription & Files */
+        .paper { background: #fff; color: #111; padding: 25px; width: 85%; max-width: 320px; border-radius: 2px; box-shadow: 10px 10px 40px rgba(0,0,0,0.8); text-align: left; position: relative; }
+        .rx-paper { transform: rotate(-2deg); font-family: 'Georgia', serif; }
+        .sig { font-family: 'Dancing Script'; font-size: 1.5rem; color: var(--blue); text-align: right; margin-top: 10px; }
+
+        /* Buttons */
+        .btn { background: var(--red); color: #fff; border: none; padding: 12px 30px; border-radius: 50px; font-family: 'Orbitron'; font-size: 0.7rem; cursor: pointer; margin-top: 20px; box-shadow: 0 0 15px var(--red); }
+        #no-btn { position: absolute; transition: 0.2s; background: #444; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+    </style>
+</head>
+<body>
+
+    <div id="slide1" class="stage active">
+        <div class="door-scene" onclick="openClinic()">
+            <div id="door" class="door">
+                <div class="door-sign">DR. ASHU'S CLINIC</div>
+            </div>
+        </div>
+        <p style="font-size:0.7rem; opacity:0.6; margin-top:15px;">“Only serious heart cases allowed.”</p>
+        <div id="case-box" style="display:none; margin-top:15px;">
+            <p style="color:var(--red); font-family:'Orbitron';">CASE #786-A: URGENT</p>
+            <button class="btn" onclick="nextSlide(1, 2)">Enter Patient Saim</button>
+        </div>
+    </div>
+
+    <div id="slide2" class="stage">
+        <h3 id="scan-text" style="color:var(--blue); font-family:'Orbitron';">SCANNING...</h3>
+        <div class="scan-line"></div>
+        <div id="symptom-list" style="display:none; text-align:left; background:rgba(255,255,255,0.05); padding:15px; border-radius:10px; margin-top:15px;">
+            <p id="s1" style="display:none;">💓 Pulse: Ashu-Speed</p>
+            <p id="s2" style="display:none;">👀 Vision: Only Ashu Visible</p>
+            <p id="s3" style="display:none;">💭 Thoughts: 24/7 Ashu</p>
+        </div>
+        <button id="scan-btn" class="btn" style="display:none;" onclick="nextSlide(2, 3)">Run Heart Scan</button>
+    </div>
+
+    <div id="slide3" class="stage">
+        <div class="paper rx-paper" onclick="document.getElementById('secret').style.display='block'">
+            <div style="font-size:2.5rem; color:var(--red); font-weight:bold;">Rx</div>
+            <p><b>Med:</b> Ashu-Cillin 500mg</p>
+            <p><b>Dose:</b> Lifetime</p>
+            <p id="secret" style="display:none; color:var(--blue); font-size:0.7rem;">* Refill valid only after Birthday Hug.</p>
+            <div class="sig">Signed: Dr. Ashu 👑</div>
+        </div>
+        <button class="btn" onclick="nextSlide(3, 4)">Next Slide</button>
+    </div>
+
+    <div id="slide4" class="stage">
+        <div style="font-size:5rem; color:var(--red); animation: beat 0.8s infinite; font-family:'Orbitron';">05</div>
+        <p style="letter-spacing:5px;">DAYS LEFT</p>
+        <p style="font-size:0.8rem; max-width:280px;">"Dawai ne patient ko theek kar diya... lekin discharge tab hoga jab Doctor permanent guardian ban jaye."</p>
+        <button class="btn" onclick="nextSlide(4, 5)">Doctor's Private Note</button>
+    </div>
+
+    <div id="slide5" class="stage">
+        <h2 style="color:var(--gold);">SECRET FILE</h2>
+        <div class="paper" style="background:#111; color:#fff; border-left:4px solid var(--gold);">
+            <p><b>Observation:</b> Emotionally dependent.</p>
+            <p><b>Risk:</b> Extremely Dangerous without her.</p>
+            <p style="color:var(--red); font-weight:bold;">Recommend Lifetime Partnership.</p>
+        </div>
+        <button class="btn" onclick="nextSlide(5, 6)">Start Treatment Plan</button>
+    </div>
+
+    <div id="slide6" class="stage">
+        <h3>Approve permanent treatment?</h3>
+        <div style="position:relative; width:100%; height:120px;">
+            <button class="btn" onclick="nextSlide(6, 7)">YES ❤️</button>
+            <button id="no-btn" class="btn" onmouseover="moveNo()">NO 😏</button>
+        </div>
+    </div>
+
+    <div id="slide7" class="stage">
+        <div class="paper" style="border:5px double var(--gold); text-align:center;">
+            <h4 style="margin:0;">DISCHARGE CERTIFICATE</h4>
+            <hr>
+            <p style="font-weight:bold; color:var(--red);">Admitted To Doctor's Heart Permanently 💖</p>
+            <p style="font-size:0.7rem; font-style:italic;">"In 5 days, the Queen was born..."</p>
+        </div>
+        <h2 style="font-family:'Dancing Script'; color:var(--pink); margin-top:20px;">ASHU 👑</h2>
+        <button class="btn" style="background:#fff; color:#000;" onclick="location.reload()">Reset Case</button>
+    </div>
+
+    <script>
+        function openClinic() {
+            document.getElementById('door').classList.add('open');
+            setTimeout(() => { document.getElementById('case-box').style.display = 'block'; }, 1000);
+        }
+        function nextSlide(c, n) {
+            document.getElementById('slide' + c).classList.remove('active');
+            document.getElementById('slide' + n).classList.add('active');
+            if(n === 2) startScan();
+        }
+        function startScan() {
+            let i = 0; let txts = ["Checking Loyalty...", "Syncing Hearts...", "1000% LOVE!"];
+            let int = setInterval(() => {
+                document.getElementById('scan-text').innerText = txts[i++];
+                if(i === 3) {
+                    clearInterval(int);
+                    document.getElementById('symptom-list').style.display='block';
+                    setTimeout(()=>document.getElementById('s1').style.display='block', 400);
+                    setTimeout(()=>document.getElementById('s2').style.display='block', 800);
+                    setTimeout(()=>document.getElementById('s3').style.display='block', 1200);
+                    setTimeout(()=>document.getElementById('scan-btn').style.display='block', 1600);
+                }
+            }, 1000);
+        }
+        function moveNo() {
+            let b = document.getElementById('no-btn');
+            b.style.left = Math.random() * 70 + '%'; b.style.top = Math.random() * 70 + '%';
+        }
+    </script>
+</body>
+</html>
