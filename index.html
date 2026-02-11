@@ -3,138 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Case #786-A | Patient Saim</title>
+    <title>3D Case #786-A | Patient Saim</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Orbitron:wght@400;700&family=Poppins:wght@300;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Dancing+Script:wght@700&family=Poppins:wght@300;600&display=swap');
+
         :root { --red: #ff0055; --blue: #00d4ff; --neon: #39ff14; --gold: #ffb703; --dark: #050505; }
         
-        body, html { margin:0; padding:0; overflow:hidden; font-family:'Poppins', sans-serif; background: var(--dark); color: #fff; cursor: crosshair; }
-        .stage { display:none; width:100vw; height:100vh; justify-content:center; align-items:center; flex-direction:column; text-align:center; position:absolute; padding: 20px; box-sizing: border-box; background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%); }
-        .active { display:flex; animation: fadeIn 0.8s forwards; }
+        * { box-sizing: border-box; }
+        body, html { margin:0; padding:0; overflow:hidden; font-family:'Poppins', sans-serif; background: var(--dark); color: #fff; height: 100vh; perspective: 1500px; }
 
-        /* Slide 1: 3D Door */
-        .door-scene { perspective: 1200px; width: 180px; height: 280px; cursor: pointer; }
-        .door { width: 100%; height: 100%; background: #2c3e50; border: 4px solid #fff; border-radius: 5px; transform-origin: left; transition: 1.5s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
-        .door.open { transform: rotateY(-110deg); }
-        .door-sign { position: absolute; top: 25%; left: 10%; width: 80%; background: var(--red); color: white; padding: 8px 0; font-family: 'Orbitron'; font-size: 0.6rem; }
+        /* 3D Background Glitter */
+        .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+        .star { position: absolute; background: white; border-radius: 50%; opacity: 0.5; animation: twinkle var(--d) infinite; }
 
-        /* Scanning UI */
-        .scan-line { width: 250px; height: 2px; background: var(--neon); box-shadow: 0 0 15px var(--neon); position: relative; animation: scanAnim 2s infinite; }
-        @keyframes scanAnim { 0%, 100% { top: -40px; } 50% { top: 40px; } }
+        /* Stage Containers */
+        .stage { display:none; width:100vw; height:100vh; justify-content:center; align-items:center; flex-direction:column; position:absolute; padding: 20px; z-index: 10; transform-style: preserve-3d; }
+        .active { display:flex; animation: slideEnter 1s cubic-bezier(0.23, 1, 0.32, 1) forwards; }
 
-        /* Prescription & Files */
-        .paper { background: #fff; color: #111; padding: 25px; width: 85%; max-width: 320px; border-radius: 2px; box-shadow: 10px 10px 40px rgba(0,0,0,0.8); text-align: left; position: relative; }
-        .rx-paper { transform: rotate(-2deg); font-family: 'Georgia', serif; }
-        .sig { font-family: 'Dancing Script'; font-size: 1.5rem; color: var(--blue); text-align: right; margin-top: 10px; }
+        /* Slide 1: 3D Door Animation */
+        .door-wrapper { perspective: 1000px; width: 220px; height: 320px; cursor: pointer; transform: translateZ(50px); }
+        .door-3d { width: 100%; height: 100%; background: linear-gradient(45deg, #1a1a1a, #333); border: 5px solid #fff; border-radius: 5px; position: relative; transform-origin: left; transition: 1.8s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 50px rgba(0,0,0,1); }
+        .door-3d.open { transform: rotateY(-120deg); box-shadow: 30px 0 60px rgba(0,0,0,0.8); }
+        .door-sign { position: absolute; top: 20%; left: 10%; width: 80%; background: var(--red); color: white; padding: 10px; font-family: 'Orbitron'; font-size: 0.7rem; text-align: center; border: 1px solid rgba(255,255,255,0.3); }
 
-        /* Buttons */
-        .btn { background: var(--red); color: #fff; border: none; padding: 12px 30px; border-radius: 50px; font-family: 'Orbitron'; font-size: 0.7rem; cursor: pointer; margin-top: 20px; box-shadow: 0 0 15px var(--red); }
-        #no-btn { position: absolute; transition: 0.2s; background: #444; }
+        /* Slide 2: Holographic Scanner */
+        .hologram { width: 280px; height: 150px; border: 2px solid var(--blue); position: relative; overflow: hidden; background: rgba(0, 180, 216, 0.05); }
+        .scan-bar { position: absolute; width: 100%; height: 5px; background: var(--neon); box-shadow: 0 0 20px var(--neon); animation: scanLoop 2s infinite linear; }
+        .symptom-text { text-align: left; margin-top: 20px; font-family: 'Orbitron'; font-size: 0.8rem; line-height: 2; color: var(--neon); }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        /* Slide 3: 3D Rx Paper */
+        .rx-card { background: #fff; color: #111; padding: 30px; width: 320px; border-radius: 3px; transform: rotateX(10deg) rotateY(-5deg); box-shadow: 20px 20px 60px rgba(0,0,0,0.7); text-align: left; font-family: 'Times New Roman', serif; position: relative; transition: 0.5s; }
+        .rx-card:hover { transform: rotateX(0deg) rotateY(0deg) scale(1.05); }
+        .rx-card h1 { color: var(--red); margin: 0; font-size: 3rem; }
+
+        /* Slide 4: Pulse Countdown */
+        .pulse-box { width: 180px; height: 180px; background: rgba(255,0,85,0.1); border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid var(--red); animation: pulseBeat 0.8s infinite; }
+        .big-num { font-family: 'Orbitron'; font-size: 6rem; color: var(--red); text-shadow: 0 0 30px var(--red); }
+
+        /* Slide 5: Secret File */
+        .folder { width: 300px; padding: 20px; background: #222; border-left: 10px solid var(--gold); border-radius: 5px; text-align: left; transform: rotateY(20deg); box-shadow: -10px 10px 30px rgba(0,0,0,0.5); }
+
+        /* Slide 6: Buttons Move */
+        .btn { background: var(--red); color: white; border: none; padding: 15px 40px; border-radius: 50px; font-family: 'Orbitron'; cursor: pointer; transition: 0.3s; margin: 10px; box-shadow: 0 10px 20px rgba(255,0,85,0.3); }
+        #no-btn { position: absolute; }
+
+        /* Slide 7: Certificate */
+        .cert { background: ivory; padding: 30px; border: 15px double var(--gold); color: #333; width: 340px; transform: rotateX(5deg); box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
+
+        /* Animations */
+        @keyframes scanLoop { 0% { top: -10%; } 100% { top: 110%; } }
+        @keyframes pulseBeat { 0% { transform: scale(1); box-shadow: 0 0 0px var(--red); } 50% { transform: scale(1.1); box-shadow: 0 0 40px var(--red); } 100% { transform: scale(1); box-shadow: 0 0 0px var(--red); } }
+        @keyframes slideEnter { from { opacity: 0; transform: translateZ(-500px) rotateX(20deg); } to { opacity: 1; transform: translateZ(0) rotateX(0deg); } }
+        @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
     </style>
 </head>
 <body>
 
+    <div class="stars" id="starField"></div>
+
     <div id="slide1" class="stage active">
-        <div class="door-scene" onclick="openClinic()">
-            <div id="door" class="door">
-                <div class="door-sign">DR. ASHU'S CLINIC</div>
+        <div class="door-wrapper" onclick="openDoor()">
+            <div id="door3d" class="door-3d">
+                <div class="door-sign">DR. ASHU'S<br>CLINIC</div>
             </div>
         </div>
-        <p style="font-size:0.7rem; opacity:0.6; margin-top:15px;">“Only serious heart cases allowed.”</p>
-        <div id="case-box" style="display:none; margin-top:15px;">
-            <p style="color:var(--red); font-family:'Orbitron';">CASE #786-A: URGENT</p>
+        <div id="slide1-ui" style="display:none; margin-top: 20px;">
+            <p style="color:var(--red); font-family:'Orbitron';">CASE #786-A: URGENT EMERGENCY</p>
             <button class="btn" onclick="nextSlide(1, 2)">Enter Patient Saim</button>
         </div>
+        <p id="h-text" style="opacity:0.5; font-size:0.7rem; margin-top:20px;">“Only serious heart cases allowed.”</p>
     </div>
 
     <div id="slide2" class="stage">
-        <h3 id="scan-text" style="color:var(--blue); font-family:'Orbitron';">SCANNING...</h3>
-        <div class="scan-line"></div>
-        <div id="symptom-list" style="display:none; text-align:left; background:rgba(255,255,255,0.05); padding:15px; border-radius:10px; margin-top:15px;">
-            <p id="s1" style="display:none;">💓 Pulse: Ashu-Speed</p>
-            <p id="s2" style="display:none;">👀 Vision: Only Ashu Visible</p>
-            <p id="s3" style="display:none;">💭 Thoughts: 24/7 Ashu</p>
+        <h2 style="font-family:'Orbitron'; color:var(--blue);">DRAMATIC SCAN</h2>
+        <div class="hologram">
+            <div class="scan-bar"></div>
+            <div id="sym-reveal" class="symptom-text" style="display:none; padding:10px;">
+                > Pulse: Ashu-Speed...<br>
+                > Vision: 100% Ashu...<br>
+                > Mind: 24/7 Ashu...
+            </div>
         </div>
-        <button id="scan-btn" class="btn" style="display:none;" onclick="nextSlide(2, 3)">Run Heart Scan</button>
+        <button id="scan-btn" class="btn" style="display:none;" onclick="nextSlide(2, 3)">Run Full Scan</button>
     </div>
 
     <div id="slide3" class="stage">
-        <div class="paper rx-paper" onclick="document.getElementById('secret').style.display='block'">
-            <div style="font-size:2.5rem; color:var(--red); font-weight:bold;">Rx</div>
+        <div class="rx-card" onclick="this.querySelector('.hidden').style.opacity='1'">
+            <h1>Rx</h1>
             <p><b>Med:</b> Ashu-Cillin 500mg</p>
-            <p><b>Dose:</b> Lifetime</p>
-            <p id="secret" style="display:none; color:var(--blue); font-size:0.7rem;">* Refill valid only after Birthday Hug.</p>
-            <div class="sig">Signed: Dr. Ashu 👑</div>
+            <p><b>Dose:</b> Lifetime (Unlimited)</p>
+            <p class="hidden" style="opacity:0; color:var(--blue); font-weight:bold; font-size:0.7rem; transition:1s;">* Secret: Refill valid only after Birthday Hug.</p>
+            <div style="text-align:right; margin-top:20px; font-family:'Dancing Script'; font-size:1.5rem; color:var(--blue);">
+                Signed: Dr. Ashu 👑
+            </div>
         </div>
-        <button class="btn" onclick="nextSlide(3, 4)">Next Slide</button>
+        <button class="btn" onclick="nextSlide(3, 4)">Continue</button>
     </div>
 
     <div id="slide4" class="stage">
-        <div style="font-size:5rem; color:var(--red); animation: beat 0.8s infinite; font-family:'Orbitron';">05</div>
-        <p style="letter-spacing:5px;">DAYS LEFT</p>
-        <p style="font-size:0.8rem; max-width:280px;">"Dawai ne patient ko theek kar diya... lekin discharge tab hoga jab Doctor permanent guardian ban jaye."</p>
-        <button class="btn" onclick="nextSlide(4, 5)">Doctor's Private Note</button>
+        <div class="pulse-box">
+            <div class="big-num">05</div>
+        </div>
+        <h3 style="font-family:'Orbitron'; letter-spacing:8px; margin-top:20px;">DAYS LEFT</h3>
+        <p style="max-width:300px; font-size:0.8rem; line-height:1.6;">
+            "Dawai ne patient ko theek kar diya hai... lekin discharge tab hoga jab Doctor permanent guardian ban jaye."
+        </p>
+        <button class="btn" onclick="nextSlide(4, 5)">Doctor's Note</button>
     </div>
 
     <div id="slide5" class="stage">
-        <h2 style="color:var(--gold);">SECRET FILE</h2>
-        <div class="paper" style="background:#111; color:#fff; border-left:4px solid var(--gold);">
-            <p><b>Observation:</b> Emotionally dependent.</p>
-            <p><b>Risk:</b> Extremely Dangerous without her.</p>
-            <p style="color:var(--red); font-weight:bold;">Recommend Lifetime Partnership.</p>
+        <h2 style="color:var(--gold); font-family:'Orbitron';">CONFIDENTIAL</h2>
+        <div class="folder">
+            <p><b>Observation:</b> Patient emotionally dependent.</p>
+            <p><b>Risk Level:</b> Extremely Dangerous.</p>
+            <p style="color:var(--red); font-weight:bold; margin-top:10px;">"Recommend Lifetime Partnership."</p>
         </div>
-        <button class="btn" onclick="nextSlide(5, 6)">Start Treatment Plan</button>
+        <button class="btn" onclick="nextSlide(5, 6)">Approve Plan</button>
     </div>
 
     <div id="slide6" class="stage">
-        <h3>Approve permanent treatment?</h3>
-        <div style="position:relative; width:100%; height:120px;">
+        <h3>Do you approve permanent treatment?</h3>
+        <div style="position:relative; width:100%; height:150px; display:flex; justify-content:center; align-items:center;">
             <button class="btn" onclick="nextSlide(6, 7)">YES ❤️</button>
-            <button id="no-btn" class="btn" onmouseover="moveNo()">NO 😏</button>
+            <button id="no-btn" class="btn" style="background:#444;" onmouseover="moveNo()">NO 😏</button>
         </div>
     </div>
 
     <div id="slide7" class="stage">
-        <div class="paper" style="border:5px double var(--gold); text-align:center;">
-            <h4 style="margin:0;">DISCHARGE CERTIFICATE</h4>
-            <hr>
-            <p style="font-weight:bold; color:var(--red);">Admitted To Doctor's Heart Permanently 💖</p>
-            <p style="font-size:0.7rem; font-style:italic;">"In 5 days, the Queen was born..."</p>
+        <div class="cert">
+            <h4 style="margin:0; text-align:center;">DISCHARGE CERTIFICATE</h4>
+            <hr border="1">
+            <p style="font-weight:bold; color:var(--red); text-align:center;">
+                Patient Discharged From Hospital<br>
+                Admitted To Doctor's Heart — Permanently 💖
+            </p>
+            <p style="font-size:0.7rem; text-align:center; font-style:italic;">
+                "In 5 days, the Queen was born... and one patient lost his heart forever."
+            </p>
         </div>
-        <h2 style="font-family:'Dancing Script'; color:var(--pink); margin-top:20px;">ASHU 👑</h2>
+        <h2 style="font-family:'Dancing Script'; color:var(--red); font-size:3rem; margin-top:20px;">ASHU 👑</h2>
         <button class="btn" style="background:#fff; color:#000;" onclick="location.reload()">Reset Case</button>
     </div>
 
     <script>
-        function openClinic() {
-            document.getElementById('door').classList.add('open');
-            setTimeout(() => { document.getElementById('case-box').style.display = 'block'; }, 1000);
+        // Star Field Generation
+        const stars = document.getElementById('starField');
+        for(let i=0; i<80; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            const size = Math.random() * 3 + 'px';
+            star.style.width = size;
+            star.style.height = size;
+            star.style.left = Math.random() * 100 + 'vw';
+            star.style.top = Math.random() * 100 + 'vh';
+            star.style.setProperty('--d', Math.random() * 3 + 2 + 's');
+            stars.appendChild(star);
         }
+
+        function openDoor() {
+            document.getElementById('door3d').classList.add('open');
+            document.getElementById('h-text').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('slide1-ui').style.display = 'block';
+            }, 1000);
+        }
+
         function nextSlide(c, n) {
             document.getElementById('slide' + c).classList.remove('active');
             document.getElementById('slide' + n).classList.add('active');
-            if(n === 2) startScan();
+            if(n === 2) startScanning();
         }
-        function startScan() {
-            let i = 0; let txts = ["Checking Loyalty...", "Syncing Hearts...", "1000% LOVE!"];
-            let int = setInterval(() => {
-                document.getElementById('scan-text').innerText = txts[i++];
-                if(i === 3) {
-                    clearInterval(int);
-                    document.getElementById('symptom-list').style.display='block';
-                    setTimeout(()=>document.getElementById('s1').style.display='block', 400);
-                    setTimeout(()=>document.getElementById('s2').style.display='block', 800);
-                    setTimeout(()=>document.getElementById('s3').style.display='block', 1200);
-                    setTimeout(()=>document.getElementById('scan-btn').style.display='block', 1600);
-                }
-            }, 1000);
+
+        function startScanning() {
+            setTimeout(() => {
+                document.getElementById('sym-reveal').style.display = 'block';
+                document.getElementById('scan-btn').style.display = 'block';
+            }, 2500);
         }
+
         function moveNo() {
-            let b = document.getElementById('no-btn');
-            b.style.left = Math.random() * 70 + '%'; b.style.top = Math.random() * 70 + '%';
+            const btn = document.getElementById('no-btn');
+            const x = Math.random() * (window.innerWidth - 100);
+            const y = Math.random() * (window.innerHeight - 100);
+            btn.style.position = 'fixed';
+            btn.style.left = x + 'px';
+            btn.style.top = y + 'px';
         }
     </script>
 </body>
